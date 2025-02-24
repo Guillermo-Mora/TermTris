@@ -18,12 +18,12 @@ public class TermTris {
     public void fillBoard() {
         for (int i = 0; i < termtetrisBoard.length; ) {
             if (i >= termtetrisBoard.length - 12) {
-                termtetrisBoard[i] = 2;
+                termtetrisBoard[i] = 3;
                 i++;
             } else {
                 for (int j = 0; j < 12; j++, i++) {
                     if (j == 0 || j == 11) {
-                        termtetrisBoard[i] = 2;
+                        termtetrisBoard[i] = 3;
                     } else {
                         termtetrisBoard[i] = 0;
                     }
@@ -46,7 +46,7 @@ public class TermTris {
     //Constructor
     public TermTris() {
         this.termtetrisBoard = new int[252];
-        this.blockType = new char[]{'□', '■', '▨'};
+        this.blockType = new char[]{'□', '■', '▣', '▨'};
         this.pieces = new Pieces();
     }
     //
