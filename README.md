@@ -1,2 +1,2 @@
 # TermTris
-Java Termianl Tetris
+Java Terminal Tetris
