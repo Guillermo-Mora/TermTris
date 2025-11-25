@@ -19,6 +19,7 @@ public class Messages {
     }
 
     public String menuMessage() {
+        String option;
         Scanner lector = new Scanner(System.in);
         System.out.println("\n" +
                 "████████╗███████╗██████╗ ███╗   ███╗████████╗███████╗████████╗██████╗ ██╗███████╗\n" +
@@ -31,6 +32,18 @@ public class Messages {
                            "║ Press Enter to start a new Game [ ▶ ]\n" +
                            "║ Type [ Q ] to exit [ ✖ ]\n" +
                            "║ ➤ ] ");
-        return lector.nextLine();
+
+        do {
+            option = lector.nextLine();
+            if (!option.equalsIgnoreCase("q") && !option.isEmpty()) {
+                System.out.print( "║ Invalid option [ ! ]\n" +
+                        "║ Press Enter to start a new Game [ ▶ ]\n" +
+                        "║ Type [ Q ] to exit [ ✖ ]\n" +
+                        "║ ➤ ] ");
+                continue;
+            }
+            break;
+        } while (true);
+        return option;
     }
 }

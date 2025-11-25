@@ -1,11 +1,8 @@
 import java.util.*;
 
 public class Pieces {
-    //Variables
     private final HashMap<Integer, int[]> pieces;
-    //
 
-    //Store pieces
     public void storePieces() {
         pieces.put(0, new int[]{1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1});
         pieces.put(1, new int[]{1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1});
@@ -15,9 +12,7 @@ public class Pieces {
         pieces.put(5, new int[]{1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1});
         pieces.put(6, new int[]{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1});
     }
-    //
 
-    //Return random piece
     public int[] randomPiece() {
         return pieces.get((int) (Math.random() * 7));
     }
@@ -27,5 +22,4 @@ public class Pieces {
     public Pieces() {
         this.pieces = new HashMap<>();
     }
-    //
 }
