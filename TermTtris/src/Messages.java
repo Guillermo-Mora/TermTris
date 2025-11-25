@@ -13,7 +13,7 @@ public class Messages {
 
     public void gameOverMessage() {
         Scanner lector = new Scanner(System.in);
-        System.out.println("Game over ☠\n" +
+        System.out.println("\nGame over ☠\n" +
                            "Press Enter to return to Menu ▶");
         lector.next();
     }
@@ -30,7 +30,7 @@ public class Messages {
                 "   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚══════╝\n");
         System.out.print("║ Welcome to TermTetris! ▙ \n" +
                            "║ Press Enter to start a new Game [ ▶ ]\n" +
-                           "║ Type [ Q ] to exit [ ✖ ]\n" +
+                           "║ Type Q to exit [ ✖ ]\n" +
                            "║ ➤ ] ");
 
         do {
@@ -38,7 +38,7 @@ public class Messages {
             if (!option.equalsIgnoreCase("q") && !option.isEmpty()) {
                 System.out.print( "║ Invalid option [ ! ]\n" +
                         "║ Press Enter to start a new Game [ ▶ ]\n" +
-                        "║ Type [ Q ] to exit [ ✖ ]\n" +
+                        "║ Type Q to exit [ ✖ ]\n" +
                         "║ ➤ ] ");
                 continue;
             }

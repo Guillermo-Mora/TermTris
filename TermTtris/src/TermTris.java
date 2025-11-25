@@ -1,3 +1,7 @@
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.terminal.Terminal;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -17,26 +21,39 @@ public class TermTris {
         }
     }
 
-    //Start a game
     public void gameStart() {
         fillBoard();
         buildPieces();
-        if (!randomPiceInBoard()) {
-            messages.gameOverMessage();
-        }
-        showBoard();
 
-        boolean pieceContinueFall = true;
+        DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
+        Terminal terminal = null;
+        try {
+            terminal = defaultTerminalFactory.createTerminal();
+            terminal.enterPrivateMode();
+            terminal.clearScreen();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         do {
-            if (!movePieceDown()) {
-                pieceContinueFall = false;
-                transformPieceToStatic();
+            if (!randomPiceInBoard()) {
+                showBoard();
+                messages.gameOverMessage();
+                break;
             }
             showBoard();
-        } while (pieceContinueFall);
+
+            boolean pieceContinueFall = true;
+            do {
+                if (!movePieceDown()) {
+                    pieceContinueFall = false;
+                    transformPieceToStatic();
+                }
+                showBoard();
+            } while (pieceContinueFall);
+        } while (true);
     }
 
-    //Fill the board
     public void fillBoard() {
         for (int i = 0; i < termtetrisBoard.length; ) {
             if (i >= termtetrisBoard.length - 12) {
@@ -54,17 +71,17 @@ public class TermTris {
         }
     }
 
-    //Show current board
     public void showBoard() {
+        StringBuilder currentBoard = new StringBuilder();
         for (int i = 0; i < termtetrisBoard.length; i++) {
             if (i % 12 == 0) {
-                System.out.println();
+                currentBoard.append("\n");
             }
-            System.out.print(blockType[termtetrisBoard[i]]);
+            currentBoard.append(blockType[termtetrisBoard[i]]);
         }
+        System.out.print("\n" + currentBoard);
     }
 
-    //Build pieces
     public void buildPieces() {
         pieces.storePieces();
     }
