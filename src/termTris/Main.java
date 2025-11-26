@@ -1,3 +1,5 @@
+package termTris;
+
 public class Main {
     public static void main(String[] args) {
         Pieces pieces = new Pieces();

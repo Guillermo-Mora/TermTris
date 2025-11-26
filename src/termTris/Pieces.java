@@ -1,3 +1,5 @@
+package termTris;
+
 import java.util.*;
 
 public class Pieces {
