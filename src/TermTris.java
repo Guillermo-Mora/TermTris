@@ -1,10 +1,17 @@
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import org.w3c.dom.Text;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class TermTris {
     //Variables
@@ -16,42 +23,66 @@ public class TermTris {
     //Start the program
     public void start() {
         if (!messages.menuMessage().equalsIgnoreCase("Q")) {
-            messages.clearScreen();
+            //messages.clearScreen();
             gameStart();
         }
     }
 
     public void gameStart() {
+        boolean running = true;
+        boolean newPiece = true;
         fillBoard();
         buildPieces();
+        String[] boardLines;
 
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
-        Terminal terminal = null;
+        Terminal terminal;
+
         try {
             terminal = defaultTerminalFactory.createTerminal();
+            Screen screen = new TerminalScreen(terminal);
+            TextGraphics textGraphics = screen.newTextGraphics();
+            screen.startScreen();
             terminal.enterPrivateMode();
-            terminal.clearScreen();
+            screen.clear();
+            screen.refresh();
+            terminal.setCursorPosition(0,0);
+            screen.setCursorPosition(terminal.getCursorPosition());
+
+            do {
+                if (newPiece) {
+                    newPiece = false;
+                    if (!randomPiceInBoard()) running = false;
+                } else {
+                    if (!movePieceDown()) {
+                        transformPieceToStatic();
+                        newPiece = true;
+                    }
+                }
+
+                boardLines = showBoard();
+                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i, boardLines[i]);
+                screen.refresh();
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } while (running);
+            screen.stopScreen();
+            terminal.exitPrivateMode();
+            screen.close();
+            terminal.close();
+
+            messages.gameOverMessage();
+
+            String keyPressed = String.valueOf(screen.pollInput().getKeyType());
+            System.out.println(keyPressed);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        do {
-            if (!randomPiceInBoard()) {
-                showBoard();
-                messages.gameOverMessage();
-                break;
-            }
-            showBoard();
-
-            boolean pieceContinueFall = true;
-            do {
-                if (!movePieceDown()) {
-                    pieceContinueFall = false;
-                    transformPieceToStatic();
-                }
-                showBoard();
-            } while (pieceContinueFall);
-        } while (true);
     }
 
     public void fillBoard() {
@@ -71,15 +102,22 @@ public class TermTris {
         }
     }
 
-    public void showBoard() {
-        StringBuilder currentBoard = new StringBuilder();
+    public String[] showBoard() {
+        String[] lines = new String[21];
+        int currentLine = 0;
+        StringBuilder currentString = new StringBuilder();
+
         for (int i = 0; i < termtetrisBoard.length; i++) {
-            if (i % 12 == 0) {
-                currentBoard.append("\n");
+
+            currentString.append(blockType[termtetrisBoard[i]]);
+
+            if ((i + 1) % 12 == 0) {
+                lines[currentLine] = currentString.toString();
+                currentLine++;
+                currentString = new StringBuilder();
             }
-            currentBoard.append(blockType[termtetrisBoard[i]]);
         }
-        System.out.print("\n" + currentBoard);
+        return lines;
     }
 
     public void buildPieces() {
