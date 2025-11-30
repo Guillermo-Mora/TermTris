@@ -11,6 +11,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class TermTris {
@@ -247,10 +248,24 @@ public class TermTris {
     }
 
     public void rotatePieceClockwise() {
-        ArrayList<Integer> horizontalPiecesRows = new ArrayList<>();
-        int rowPosition = 0;
+        ArrayList<Integer> alteredPositions = new ArrayList<>();
         for (int i = 0; i < termtetrisBoard.length; i++) {
-            if (termtetrisBoard[i] == 3) rowPosition++;
+            if (alteredPositions.contains(i)) continue;
+            if (termtetrisBoard[i] == 1) {
+                ArrayList<Integer> currentRow = new ArrayList<>();
+                while (termtetrisBoard[i] == 1) {
+                    currentRow.add(i);
+                    termtetrisBoard[i] = 0;
+                    i++;
+                }
+                if (!currentRow.isEmpty()) {
+                    System.out.println(currentRow);
+                    for (int j = 0; j < currentRow.size(); j++) {
+                        alteredPositions.add(currentRow.get(j) + j);
+                        termtetrisBoard[currentRow.get(j) + j] = 1;
+                    }
+                }
+            }
         }
     }
 
