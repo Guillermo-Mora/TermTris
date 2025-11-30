@@ -1,11 +1,13 @@
 package termTris;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
+import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -31,6 +33,9 @@ public class TermTris {
         fillBoard();
         buildPieces();
         String[] boardLines;
+        int pieceInTimer = 0;
+        KeyStroke keyStroke = null;
+        KeyEventDispatcher keyEventDispatcher;
 
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
         Terminal terminal;
@@ -43,29 +48,59 @@ public class TermTris {
             terminal.enterPrivateMode();
             screen.clear();
             screen.refresh();
-            terminal.setCursorPosition(0,0);
+            terminal.setCursorPosition(0, 0);
             screen.setCursorPosition(terminal.getCursorPosition());
 
             do {
+                //Detectar entrada por teclado de manera no bloqueante
+                keyStroke = screen.pollInput();
+                if (keyStroke != null) {
+                    switch (keyStroke.getKeyType()) {
+                        case ArrowRight -> movePieceHorizontal(true);
+                        case ArrowLeft -> movePieceHorizontal(false);
+                        case ArrowDown -> {
+                            if (!movePieceDown()) {
+                                transformPieceToStatic();
+                                newPiece = true;
+                            }
+                        }
+                        default -> {
+                        }
+                    }
+                }
+
+                //Añadir nueva pieca al tablero si la última ha llegado al fondo
                 if (newPiece) {
                     newPiece = false;
                     if (!randomPiceInBoard()) running = false;
-                } else {
+                }
+
+                //Mover la pieza actual hacia abajo cada 1.5 segundos
+                if (pieceInTimer == 90) {
+                    pieceInTimer = 0;
                     if (!movePieceDown()) {
                         transformPieceToStatic();
                         newPiece = true;
                     }
                 }
 
+                //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
+                boardLinesFilled();
+
+                //Mostrar el tablero actual
                 boardLines = showBoard();
                 for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i, boardLines[i]);
                 screen.refresh();
 
+                //El bucle del juego se ejecuta cada 16ms (60 veces por segundo)
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(16);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+
+                //Cada iteración equivale a 1/60 de 1 segundo
+                pieceInTimer++;
             } while (running);
             screen.stopScreen();
             terminal.exitPrivateMode();
@@ -128,7 +163,7 @@ public class TermTris {
         int i = 0, j = 0;
         while (j < randomPiece.length) {
             if (termtetrisBoard[i] != 3) {
-                if (termtetrisBoard[i] == 2 && randomPiece[j] == 1){
+                if (termtetrisBoard[i] == 2 && randomPiece[j] == 1) {
                     return false;
                 }
                 termtetrisBoard[i] = randomPiece[j];
@@ -171,7 +206,7 @@ public class TermTris {
         return true;
     }
 
-    public boolean movePieceHorizontal(boolean isRightDirection) {
+    public void movePieceHorizontal(boolean isRightDirection) {
         int direction;
 
         if (isRightDirection) direction = 1;
@@ -185,7 +220,7 @@ public class TermTris {
                 oldPositions.add(i);
 
                 if (termtetrisBoard[i + direction] == 2 || termtetrisBoard[i + direction] == 3) {
-                    return false;
+                    return;
                 }
 
                 newPositions.add(i + direction);
@@ -203,7 +238,28 @@ public class TermTris {
             if (!dontOverride) termtetrisBoard[oldPositions.get(i)] = 0;
             termtetrisBoard[newPositions.get(i)] = 1;
         }
-        return true;
+    }
+
+    public void boardLinesFilled() {
+        int filledBlocksInLine = 0;
+        for (int i = 0; i < termtetrisBoard.length; i++) {
+            if (termtetrisBoard[i] == 2) filledBlocksInLine++;
+            else filledBlocksInLine = 0;
+            if (filledBlocksInLine == 10) {
+                //Vaciar línea detectada
+                for (int j = 0; j < 10; j++) {
+                    termtetrisBoard[i - j] = 0;
+                }
+                //Mover todas las piezas estáticas 1 nivel más abajo de abajo hacia arriba a partir
+                // de la siguiente fila arriba de la vaciada
+                for (int j = i - 2; j > 0; j--) {
+                    if (termtetrisBoard[j] == 2) {
+                        termtetrisBoard[j] = 0;
+                        termtetrisBoard[j + 12] = 2;
+                    }
+                }
+            }
+        }
     }
 
     public void transformPieceToStatic() {
