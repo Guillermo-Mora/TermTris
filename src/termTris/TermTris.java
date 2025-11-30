@@ -2,6 +2,7 @@ package termTris;
 
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -22,7 +23,6 @@ public class TermTris {
     //Start the program
     public void start() {
         if (!messages.menuMessage().equalsIgnoreCase("Q")) {
-            //messages.clearScreen();
             gameStart();
         }
     }
@@ -55,18 +55,24 @@ public class TermTris {
                 //Detectar entrada por teclado de manera no bloqueante
                 keyStroke = screen.pollInput();
                 if (keyStroke != null) {
-                    switch (keyStroke.getKeyType()) {
-                        case ArrowRight -> movePieceHorizontal(true);
-                        case ArrowLeft -> movePieceHorizontal(false);
-                        case ArrowDown -> {
+                        if (keyStroke.getKeyType() == KeyType.ArrowRight) movePieceHorizontal(true);
+                        else if (keyStroke.getKeyType() == KeyType.ArrowLeft) movePieceHorizontal(false);
+                        else if (keyStroke.getKeyType() == KeyType.ArrowUp) rotatePieceClockwise();
+                        else if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == ' ') {
+                            do {
+                                if (!movePieceDown()) {
+                                    transformPieceToStatic();
+                                    newPiece = true;
+                                    break;
+                                }
+                            } while (true);
+                        }
+                        else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
                             if (!movePieceDown()) {
                                 transformPieceToStatic();
                                 newPiece = true;
                             }
                         }
-                        default -> {
-                        }
-                    }
                 }
 
                 //Añadir nueva pieca al tablero si la última ha llegado al fondo
@@ -92,14 +98,14 @@ public class TermTris {
                 for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i, boardLines[i]);
                 screen.refresh();
 
-                //El bucle del juego se ejecuta cada 16ms (60 veces por segundo)
+                //El bucle del juego se ejecuta cada 16ms (62,5 veces por segundo)
                 try {
                     Thread.sleep(16);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
 
-                //Cada iteración equivale a 1/60 de 1 segundo
+                //Cada iteración
                 pieceInTimer++;
             } while (running);
             screen.stopScreen();
@@ -237,6 +243,14 @@ public class TermTris {
             }
             if (!dontOverride) termtetrisBoard[oldPositions.get(i)] = 0;
             termtetrisBoard[newPositions.get(i)] = 1;
+        }
+    }
+
+    public void rotatePieceClockwise() {
+        ArrayList<Integer> horizontalPiecesRows = new ArrayList<>();
+        int rowPosition = 0;
+        for (int i = 0; i < termtetrisBoard.length; i++) {
+            if (termtetrisBoard[i] == 3) rowPosition++;
         }
     }
 
