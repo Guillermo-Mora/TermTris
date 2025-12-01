@@ -20,6 +20,9 @@ public class TermTris {
     private final char[] blockType;
     private final Pieces pieces;
     private final Messages messages;
+    private ArrayList<int[]> currentRandomPiece;
+
+    private int[] randomPieceCurrentState;
 
     //Start the program
     public void start() {
@@ -56,24 +59,23 @@ public class TermTris {
                 //Detectar entrada por teclado de manera no bloqueante
                 keyStroke = screen.pollInput();
                 if (keyStroke != null) {
-                        if (keyStroke.getKeyType() == KeyType.ArrowRight) movePieceHorizontal(true);
-                        else if (keyStroke.getKeyType() == KeyType.ArrowLeft) movePieceHorizontal(false);
-                        else if (keyStroke.getKeyType() == KeyType.ArrowUp) rotatePieceClockwise();
-                        else if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == ' ') {
-                            do {
-                                if (!movePieceDown()) {
-                                    transformPieceToStatic();
-                                    newPiece = true;
-                                    break;
-                                }
-                            } while (true);
-                        }
-                        else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
+                    if (keyStroke.getKeyType() == KeyType.ArrowRight) movePieceHorizontal(true);
+                    else if (keyStroke.getKeyType() == KeyType.ArrowLeft) movePieceHorizontal(false);
+                    else if (keyStroke.getKeyType() == KeyType.ArrowUp) rotatePieceClockwise();
+                    else if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == ' ') {
+                        do {
                             if (!movePieceDown()) {
                                 transformPieceToStatic();
                                 newPiece = true;
+                                break;
                             }
+                        } while (true);
+                    } else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
+                        if (!movePieceDown()) {
+                            transformPieceToStatic();
+                            newPiece = true;
                         }
+                    }
                 }
 
                 //Añadir nueva pieca al tablero si la última ha llegado al fondo
@@ -166,14 +168,23 @@ public class TermTris {
 
     //Introduce random piece in the board
     public boolean randomPiceInBoard() {
-        int[] randomPiece = randomPice();
+        //int[] randomPiece = randomPice();
+        currentRandomPiece = pieces.getPiecePositions();
+        randomPieceCurrentState = currentRandomPiece.get(1);
+
         int i = 0, j = 0;
-        while (j < randomPiece.length) {
+        int initialSpace = currentRandomPiece.getFirst().length;
+
+        while (j < randomPieceCurrentState.length - 2) {
             if (termtetrisBoard[i] != 3) {
-                if (termtetrisBoard[i] == 2 && randomPiece[j] == 1) {
-                    return false;
+                while (initialSpace > 0) {
+                    termtetrisBoard[i] = 0;
+                    initialSpace--;
+                    i++;
                 }
-                termtetrisBoard[i] = randomPiece[j];
+                if (termtetrisBoard[i] == 2 && randomPieceCurrentState[j] == 1) {
+                    return false;
+                } else termtetrisBoard[i] = randomPieceCurrentState[j];
                 i++;
                 j++;
             } else {
@@ -248,25 +259,46 @@ public class TermTris {
     }
 
     public void rotatePieceClockwise() {
-        ArrayList<Integer> alteredPositions = new ArrayList<>();
+        int nextRotationPositionY = randomPieceCurrentState[randomPieceCurrentState.length - 2];
+        int nextRotationPositionX = randomPieceCurrentState[randomPieceCurrentState.length - 1];
+        System.out.println(nextRotationPositionY);
+        System.out.println(nextRotationPositionX);
+
+        int[] randomPieceNextState;
+        int nextPieceStartPosition = 0;
+        int currentPieceRotation = currentRandomPiece.indexOf(randomPieceCurrentState);
+
+        if (currentPieceRotation == 4) randomPieceNextState = currentRandomPiece.get(1);
+        else randomPieceNextState = currentRandomPiece.get(currentPieceRotation + 1);
+
+        //Obtengo la posición inicial del primer bloque de la pieza actual y elimino la pieza
+        boolean firstBlockFound = false;
         for (int i = 0; i < termtetrisBoard.length; i++) {
-            if (alteredPositions.contains(i)) continue;
             if (termtetrisBoard[i] == 1) {
-                ArrayList<Integer> currentRow = new ArrayList<>();
-                while (termtetrisBoard[i] == 1) {
-                    currentRow.add(i);
-                    termtetrisBoard[i] = 0;
-                    i++;
-                }
-                if (!currentRow.isEmpty()) {
-                    System.out.println(currentRow);
-                    for (int j = 0; j < currentRow.size(); j++) {
-                        alteredPositions.add(currentRow.get(j) + j);
-                        termtetrisBoard[currentRow.get(j) + j] = 1;
-                    }
+                termtetrisBoard[i] = 0;
+
+                if (!firstBlockFound) {
+                    nextPieceStartPosition = i;
+                    firstBlockFound = true;
                 }
             }
         }
+
+        if (nextRotationPositionY < 0) for (int i = 0; i > nextRotationPositionY; i--) nextPieceStartPosition -= 12;
+        else for (int i = 0; i < nextRotationPositionY; i++) nextPieceStartPosition += 12;
+        nextPieceStartPosition += nextRotationPositionX;
+
+        //Añado la pieza actual con la nueva rotación a partir de la posición del primer bloque
+        // de la pieza anterior junto con sus coordenadas añadidas
+        for (int i = nextPieceStartPosition, k = 0; k < randomPieceNextState.length - 2; i++) {
+            if (termtetrisBoard[i] != 3) {
+                termtetrisBoard[i] = randomPieceNextState[k];
+                k++;
+            }
+        }
+
+        //Le asigno su siguiente posición de rotación de pieza
+        randomPieceCurrentState = randomPieceNextState;
     }
 
     public void boardLinesFilled() {
