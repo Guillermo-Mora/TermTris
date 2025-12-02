@@ -12,6 +12,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class TermTris {
@@ -20,7 +21,7 @@ public class TermTris {
     private final char[] blockType;
     private final Pieces pieces;
     private final Messages messages;
-    private ArrayList<int[]> currentRandomPiece;
+    private List<int[]> currentRandomPiece;
 
     private int[] randomPieceCurrentState;
 
@@ -35,12 +36,9 @@ public class TermTris {
         boolean running = true;
         boolean newPiece = true;
         fillBoard();
-        buildPieces();
         String[] boardLines;
         int pieceInTimer = 0;
-        KeyStroke keyStroke = null;
-        KeyEventDispatcher keyEventDispatcher;
-
+        KeyStroke keyStroke;
         DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
         Terminal terminal;
 
@@ -161,15 +159,9 @@ public class TermTris {
         return lines;
     }
 
-    public void buildPieces() {
-        pieces.storePieces();
-    }
-
-
     //Introduce random piece in the board
     public boolean randomPiceInBoard() {
-        //int[] randomPiece = randomPice();
-        currentRandomPiece = pieces.getPiecePositions();
+        currentRandomPiece = pieces.randomPiece();
         randomPieceCurrentState = currentRandomPiece.get(1);
 
         int i = 0, j = 0;
@@ -297,12 +289,14 @@ public class TermTris {
                 System.out.println("No se puede girar, fuera del rango del tablero");
                 return;
             }
-            if (termtetrisBoard[i] == 2) {
+            if (termtetrisBoard[i] == 2 && randomPieceNextState[k] == 1) {
                 System.out.println("No se puede girar, choca con otra pieza existente");
                 return;
             }
             if (k + 1 < randomPieceNextState.length -2 && i + 1 < termtetrisBoard.length) {
-                if (termtetrisBoard[i+1] == 3 && randomPieceNextState[k] == 1 && randomPieceNextState[k+1] == 1) {
+                //|| termtetrisBoard[i] != 2
+                if ((termtetrisBoard[i] != 3) && termtetrisBoard[i+1] == 3 && randomPieceNextState[k] == 1
+                        && randomPieceNextState[k+1] == 1) {
                     System.out.println("No se puede girar, da la vuelta al tablero");
                     return;
                 }
@@ -318,6 +312,7 @@ public class TermTris {
 
         //Y añado la pieza nueva rotada al tablero
         for (int i = 0; i < newRotationPositions.size(); i++) {
+            if (termtetrisBoard[newRotationPositions.get(i)] == 2 && randomPieceNextState[i] == 0) continue;
             termtetrisBoard[newRotationPositions.get(i)] = randomPieceNextState[i];
         }
 
@@ -351,11 +346,6 @@ public class TermTris {
         for (int i = 0; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 1) termtetrisBoard[i] = 2;
         }
-    }
-
-    //Get random piece
-    public int[] randomPice() {
-        return pieces.randomPiece();
     }
 
     //Constructor
