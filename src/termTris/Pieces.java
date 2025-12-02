@@ -9,7 +9,8 @@ public class Pieces {
     //+X = right -> +1
     //-X = left -> -1
     // First int[] of every piece -> initial spaces when droped in
-    // Last 2 digits of every int[] of every piece exlcuding first int[] -> Y and X Coordinates of next rotation
+    // Last 2 digits of every int[] of every piece rotation exlcuding first int[] ->
+    // Y and X Coordinates of the next rotation piece
     private final ArrayList<List<int[]>> piecesTermTetris = new ArrayList<>(
             List.of(
                     Arrays.asList(
