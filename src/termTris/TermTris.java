@@ -263,6 +263,8 @@ public class TermTris {
         int nextRotationPositionX = randomPieceCurrentState[randomPieceCurrentState.length - 1];
         System.out.println(nextRotationPositionY);
         System.out.println(nextRotationPositionX);
+        ArrayList<Integer> oldRotationPositions = new ArrayList<>();
+        ArrayList<Integer> newRotationPositions = new ArrayList<>();
 
         int[] randomPieceNextState;
         int nextPieceStartPosition = 0;
@@ -275,7 +277,7 @@ public class TermTris {
         boolean firstBlockFound = false;
         for (int i = 0; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 1) {
-                termtetrisBoard[i] = 0;
+                oldRotationPositions.add(i);
 
                 if (!firstBlockFound) {
                     nextPieceStartPosition = i;
@@ -291,10 +293,32 @@ public class TermTris {
         //Añado la pieza actual con la nueva rotación a partir de la posición del primer bloque
         // de la pieza anterior junto con sus coordenadas añadidas
         for (int i = nextPieceStartPosition, k = 0; k < randomPieceNextState.length - 2; i++) {
+            if (i >= termtetrisBoard.length || i < 0) {
+                System.out.println("No se puede girar, fuera del rango del tablero");
+                return;
+            }
+            if (termtetrisBoard[i] == 2) {
+                System.out.println("No se puede girar, choca con otra pieza existente");
+                return;
+            }
+            if (k + 1 < randomPieceNextState.length -2 && i + 1 < termtetrisBoard.length) {
+                if (termtetrisBoard[i+1] == 3 && randomPieceNextState[k] == 1 && randomPieceNextState[k+1] == 1) {
+                    System.out.println("No se puede girar, da la vuelta al tablero");
+                    return;
+                }
+            }
             if (termtetrisBoard[i] != 3) {
-                termtetrisBoard[i] = randomPieceNextState[k];
+                newRotationPositions.add(i);
                 k++;
             }
+        }
+
+        //Si la rotación es posible, elimino la pieza antigua
+        oldRotationPositions.forEach(i -> termtetrisBoard[i] = 0);
+
+        //Y añado la pieza nueva rotada al tablero
+        for (int i = 0; i < newRotationPositions.size(); i++) {
+            termtetrisBoard[newRotationPositions.get(i)] = randomPieceNextState[i];
         }
 
         //Le asigno su siguiente posición de rotación de pieza
