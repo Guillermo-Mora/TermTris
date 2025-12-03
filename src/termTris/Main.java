@@ -1,7 +1,7 @@
 package termTris;
 
 public class Main {
-    public static void main(String[] args) {
+    static void main() {
         Pieces pieces = new Pieces();
         Messages messages = new Messages();
         TermTris program = new TermTris(pieces, messages);
