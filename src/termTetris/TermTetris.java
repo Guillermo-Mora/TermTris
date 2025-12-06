@@ -338,8 +338,6 @@ public class TermTetris {
     public void rotatePieceClockwise() {
         int nextRotationPositionY = randomPieceCurrentState[randomPieceCurrentState.length - 2];
         int nextRotationPositionX = randomPieceCurrentState[randomPieceCurrentState.length - 1];
-//        System.out.println(nextRotationPositionY);
-//        System.out.println(nextRotationPositionX);
         ArrayList<Integer> oldRotationPositions = new ArrayList<>();
         ArrayList<Integer> newRotationPositions = new ArrayList<>();
         int[] randomPieceNextState;

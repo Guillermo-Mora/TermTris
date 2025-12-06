@@ -1,7 +1,5 @@
 package termTetris;
 
-import java.util.Scanner;
-
 public class Messages {
 
     public String[] gameOverMessage() {

@@ -1,7 +1,7 @@
 package termTetris;
 
 public class Main {
-    static void main() {
+    public static void main(String[] args) {
         Pieces pieces = Pieces.getInstance();
         Messages messages = new Messages();
         TermTetris program = new TermTetris(pieces, messages);
