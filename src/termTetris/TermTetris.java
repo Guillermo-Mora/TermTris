@@ -76,7 +76,7 @@ public class TermTetris {
                     }
                 }
 
-                //Añadir nueva pieca al tablero si la última ha llegado al fondo
+                //Añadir nueva pieza al tablero si la última ha llegado al fondo
                 if (newPiece) {
                     newPiece = false;
                     if (!randomPiceInBoard()) running = false;
@@ -93,8 +93,9 @@ public class TermTetris {
                     }
                 }
 
-                //Mostrar dónde caerá la pieza al bajar al final del tablero
+                //Limpiar rastro anterior de dónde caerá la pieza
                 transformBlockToAnotherBlock(4, 0);
+                //Mostrar dónde caerá la pieza al bajar al final del tablero
                 showPieceBottomPosition();
 
                 //Mostrar el tablero actual
@@ -224,6 +225,7 @@ public class TermTetris {
 
         int[] maxReached = new int[blocksQuantity];
         int[] blocksPositions = new int[blocksQuantity];
+        int[] newPositions = new int[blocksQuantity];
 
         for (int i = 0, currentPiece = -1; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 1) {
@@ -231,7 +233,8 @@ public class TermTetris {
                 blocksPositions[currentPiece] = i;
                 do {
                     if (i + maxReached[currentPiece] + 12 < termtetrisBoard.length) {
-                        if (termtetrisBoard[i + 12] != 2 && termtetrisBoard[i + 12] != 3) {
+                        if (termtetrisBoard[i + maxReached[currentPiece] + 12] == 0 ||
+                                termtetrisBoard[i + maxReached[currentPiece] + 12] == 1) {
                             maxReached[currentPiece] += 12;
                             continue;
                         }
@@ -248,13 +251,18 @@ public class TermTetris {
             }
             minEqualPosition = Math.min(minEqualPosition, maxReached[i]);
         }
-        minEqualPosition -= 12;
         System.out.println(minEqualPosition);
         System.out.println(Arrays.toString(maxReached));
+        System.out.println(Arrays.toString(blocksPositions));
 
-        for (int blocksPosition : blocksPositions) {
-            termtetrisBoard[blocksPosition + minEqualPosition] = 4;
+        if (minEqualPosition < 12) return;
+
+        for (int i = 0; i < blocksPositions.length; i++) {
+            if (termtetrisBoard[blocksPositions[i] + minEqualPosition] != 0) return;
+            newPositions[i] = blocksPositions[i] + minEqualPosition;
         }
+
+        for (int newPosition : newPositions) termtetrisBoard[newPosition] = 4;
     }
 
     public void movePieceHorizontal(boolean isRightDirection) {
