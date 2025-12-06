@@ -1,4 +1,4 @@
-package termTris;
+package termTetris;
 
 import java.util.Scanner;
 
