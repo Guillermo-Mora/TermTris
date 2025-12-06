@@ -13,18 +13,61 @@ import java.util.*;
 
 public class TermTetris {
     //Variables
-    private final int[] termtetrisBoard;
-    private final char[] blockType;
+    private final int[] termtetrisBoard = new int[252];
+    private final char[] blockType = new char[]{'□', '◼', '▣', '■', '▨'};
     private final Pieces pieces;
     private final Messages messages;
     private List<int[]> currentRandomPiece;
 
     private int[] randomPieceCurrentState;
 
+    private final DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
+    private final Terminal terminal;
+    private final Screen screen;
+
+    private final TextGraphics textGraphics;
+    private KeyStroke keyStroke;
+
+    {
+        try {
+            terminal = defaultTerminalFactory.createTerminal();
+            screen = new TerminalScreen(terminal);
+            textGraphics = screen.newTextGraphics();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     //Start the program
     public void start() {
-        if (!messages.menuMessage().equalsIgnoreCase("Q")) {
-            gameStart();
+        try {
+            screen.startScreen();
+            terminal.enterPrivateMode();
+            screen.clear();
+            terminal.setCursorPosition(0, 0);
+            screen.setCursorPosition(terminal.getCursorPosition());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String[] menuMessage = messages.menuMessage();
+        for (int i = 0; i < menuMessage.length; i++) textGraphics.putString(0, i, menuMessage[i]);
+        try {
+            screen.refresh();
+            do {
+                keyStroke = screen.readInput();
+                if (keyStroke != null) {
+                    if (keyStroke.getKeyType() == KeyType.Enter) gameStart();
+                    else if (keyStroke.getCharacter() != null &&
+                            (keyStroke.getCharacter() == 'q' || keyStroke.getCharacter() == 'Q')) break;
+                }
+            } while (true);
+            screen.stopScreen();
+            terminal.exitPrivateMode();
+            screen.close();
+            terminal.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -34,21 +77,9 @@ public class TermTetris {
         fillBoard();
         String[] boardLines;
         int pieceInTimer = 0;
-        KeyStroke keyStroke;
-        DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
-        Terminal terminal;
+        screen.clear();
 
         try {
-            terminal = defaultTerminalFactory.createTerminal();
-            Screen screen = new TerminalScreen(terminal);
-            TextGraphics textGraphics = screen.newTextGraphics();
-            screen.startScreen();
-            terminal.enterPrivateMode();
-            screen.clear();
-            screen.refresh();
-            terminal.setCursorPosition(0, 0);
-            screen.setCursorPosition(terminal.getCursorPosition());
-
             do {
                 //Detectar entrada por teclado de manera no bloqueante
                 keyStroke = screen.pollInput();
@@ -113,12 +144,20 @@ public class TermTetris {
                 //Cada iteración
                 pieceInTimer++;
             } while (running);
-            screen.stopScreen();
-            terminal.exitPrivateMode();
-            screen.close();
-            terminal.close();
 
-            messages.gameOverMessage();
+            screen.clear();
+            String[] gameOverMessage = messages.gameOverMessage();
+            for (int i = 0; i < gameOverMessage.length; i++) textGraphics.putString(0, i, gameOverMessage[i]);
+            screen.refresh();
+            do {
+                keyStroke = screen.readInput();
+                if (keyStroke != null) {
+                    if (keyStroke.getKeyType() == KeyType.Enter) gameStart();
+                    else if (keyStroke.getCharacter() != null &&
+                            (keyStroke.getCharacter() == 'q' || keyStroke.getCharacter() == 'Q'))
+                        System.exit(0);
+                }
+            } while (true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -251,9 +290,6 @@ public class TermTetris {
             }
             minEqualPosition = Math.min(minEqualPosition, maxReached[i]);
         }
-        System.out.println(minEqualPosition);
-        System.out.println(Arrays.toString(maxReached));
-        System.out.println(Arrays.toString(blocksPositions));
 
         if (minEqualPosition < 12) return;
 
@@ -435,8 +471,6 @@ public class TermTetris {
 
     //Constructor
     public TermTetris(Pieces pieces, Messages messages) {
-        this.termtetrisBoard = new int[252];
-        this.blockType = new char[]{'□', '■', '▣', '▧', '◳'};
         this.pieces = pieces;
         this.messages = messages;
     }
