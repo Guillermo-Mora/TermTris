@@ -9,9 +9,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TermTetris {
     //Variables
@@ -61,7 +59,7 @@ public class TermTetris {
                     else if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == ' ') {
                         do {
                             if (!movePieceDown()) {
-                                transformPieceToStatic();
+                                transformBlockToAnotherBlock(1, 2);
                                 //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
                                 boardLinesFilled();
                                 newPiece = true;
@@ -70,7 +68,7 @@ public class TermTetris {
                         } while (true);
                     } else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
                         if (!movePieceDown()) {
-                            transformPieceToStatic();
+                            transformBlockToAnotherBlock(1, 2);
                             //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
                             boardLinesFilled();
                             newPiece = true;
@@ -88,12 +86,16 @@ public class TermTetris {
                 if (pieceInTimer == 90) {
                     pieceInTimer = 0;
                     if (!movePieceDown()) {
-                        transformPieceToStatic();
+                        transformBlockToAnotherBlock(1, 2);
                         //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
                         boardLinesFilled();
                         newPiece = true;
                     }
                 }
+
+                //Mostrar dónde caerá la pieza al bajar al final del tablero
+                transformBlockToAnotherBlock(4, 0);
+                showPieceBottomPosition();
 
                 //Mostrar el tablero actual
                 boardLines = showBoard();
@@ -211,6 +213,48 @@ public class TermTetris {
             termtetrisBoard[newPositions.get(i)] = 1;
         }
         return true;
+    }
+
+    public void showPieceBottomPosition() {
+        int blocksQuantity = 0;
+        int minEqualPosition = 0;
+
+        for (int i = 0; i < randomPieceCurrentState.length - 2; i++)
+            if (randomPieceCurrentState[i] == 1) blocksQuantity++;
+
+        int[] maxReached = new int[blocksQuantity];
+        int[] blocksPositions = new int[blocksQuantity];
+
+        for (int i = 0, currentPiece = -1; i < termtetrisBoard.length; i++) {
+            if (termtetrisBoard[i] == 1) {
+                currentPiece++;
+                blocksPositions[currentPiece] = i;
+                do {
+                    if (i + maxReached[currentPiece] + 12 < termtetrisBoard.length) {
+                        if (termtetrisBoard[i + 12] != 2 && termtetrisBoard[i + 12] != 3) {
+                            maxReached[currentPiece] += 12;
+                            continue;
+                        }
+                    }
+                    break;
+                } while (true);
+            }
+        }
+
+        for (int i = 0; i < maxReached.length; i++) {
+            if (i == 0) {
+                minEqualPosition = maxReached[i];
+                continue;
+            }
+            minEqualPosition = Math.min(minEqualPosition, maxReached[i]);
+        }
+        minEqualPosition -= 12;
+        System.out.println(minEqualPosition);
+        System.out.println(Arrays.toString(maxReached));
+
+        for (int blocksPosition : blocksPositions) {
+            termtetrisBoard[blocksPosition + minEqualPosition] = 4;
+        }
     }
 
     public void movePieceHorizontal(boolean isRightDirection) {
@@ -375,16 +419,16 @@ public class TermTetris {
         }
     }
 
-    public void transformPieceToStatic() {
+    public void transformBlockToAnotherBlock(int block, int newBlock) {
         for (int i = 0; i < termtetrisBoard.length; i++) {
-            if (termtetrisBoard[i] == 1) termtetrisBoard[i] = 2;
+            if (termtetrisBoard[i] == block) termtetrisBoard[i] = newBlock;
         }
     }
 
     //Constructor
     public TermTetris(Pieces pieces, Messages messages) {
         this.termtetrisBoard = new int[252];
-        this.blockType = new char[]{'□', '■', '▣', '▨'};
+        this.blockType = new char[]{'□', '■', '▣', '▧', '◳'};
         this.pieces = pieces;
         this.messages = messages;
     }
