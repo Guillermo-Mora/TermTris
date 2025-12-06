@@ -64,6 +64,8 @@ public class TermTris {
                         do {
                             if (!movePieceDown()) {
                                 transformPieceToStatic();
+                                //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
+                                boardLinesFilled();
                                 newPiece = true;
                                 break;
                             }
@@ -71,6 +73,8 @@ public class TermTris {
                     } else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
                         if (!movePieceDown()) {
                             transformPieceToStatic();
+                            //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
+                            boardLinesFilled();
                             newPiece = true;
                         }
                     }
@@ -87,12 +91,11 @@ public class TermTris {
                     pieceInTimer = 0;
                     if (!movePieceDown()) {
                         transformPieceToStatic();
+                        //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
+                        boardLinesFilled();
                         newPiece = true;
                     }
                 }
-
-                //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
-                boardLinesFilled();
 
                 //Mostrar el tablero actual
                 boardLines = showBoard();
@@ -253,9 +256,9 @@ public class TermTris {
 //        System.out.println(nextRotationPositionX);
         ArrayList<Integer> oldRotationPositions = new ArrayList<>();
         ArrayList<Integer> newRotationPositions = new ArrayList<>();
-        boolean triedReAlignment = false;
         int[] randomPieceNextState;
         int nextPieceStartPosition = 0;
+        int directionToRealign = -1;
         int currentPieceRotation = currentRandomPiece.indexOf(randomPieceCurrentState);
 
         if (currentPieceRotation == 4) randomPieceNextState = currentRandomPiece.get(1);
@@ -290,36 +293,53 @@ public class TermTris {
             // continuamos para que haga +1 a la derecha en el tablero
             //-> Modificamos su posición de inicio a 1 más
             System.out.println(termtetrisBoard[i] + " | " + randomPieceNextState[k]);
-            if ((termtetrisBoard[i] == 2 || termtetrisBoard[i] == 3)
-                    && randomPieceNextState[k] == 1 && !triedReAlignment) {
+            if (k - 1 >= 0) {
+                if ((termtetrisBoard[i] == 2 || termtetrisBoard[i] == 3) && randomPieceNextState[k] == 1 && randomPieceNextState[k - 1] == 1) {
+                    boolean triedRealignment = false;
 
-                System.out.println(i+1 + " | " + termtetrisBoard.length);
-                if (i + 2 < termtetrisBoard.length) {
-                    if (termtetrisBoard[i + 1] != 3 && termtetrisBoard[i + 1] != 2) {
-                        System.out.println("Intento +1 derecha");
-                        i = nextPieceStartPosition;
-                        triedReAlignment = true;
-                        newRotationPositions.clear();
+                    System.out.println(i + 1 + " | " + termtetrisBoard.length);
+                    if (i + 2 < termtetrisBoard.length && (directionToRealign == -1 || directionToRealign == 0)) {
+                        if (termtetrisBoard[i + 1] != 3 && termtetrisBoard[i + 1] != 2) {
+                            System.out.println("Intento +1 derecha");
+                            nextPieceStartPosition++;
+                            i = nextPieceStartPosition - 1;
+                            triedRealignment = true;
+                            directionToRealign = 0;
+                            newRotationPositions.clear();
+                        }
                     }
-                }
 
-                System.out.println(i-1 + " | " + 0);
-                if (i - 1 >= 0 && !triedReAlignment) {
-                    if (termtetrisBoard[i - 1] != 3 && termtetrisBoard[i - 1] != 2) {
-                        System.out.println("Intento -1 izquierda");
-                        i = nextPieceStartPosition-2;
-                        triedReAlignment = true;
-                        newRotationPositions.clear();
+                    System.out.println(i - 1 + " | " + 0);
+                    if (i - 1 >= 0 && !triedRealignment && (directionToRealign == -1 || directionToRealign == 1)) {
+                        if (termtetrisBoard[i - 1] != 3 && termtetrisBoard[i - 1] != 2) {
+                            System.out.println("Intento -1 izquierda");
+                            nextPieceStartPosition--;
+                            i = nextPieceStartPosition - 1;
+                            triedRealignment = true;
+                            directionToRealign = 1;
+                            newRotationPositions.clear();
+                        }
                     }
-                }
 
-                if (!triedReAlignment) {
-                    System.out.println("Tras realinear la pieza a izquierda/derecha sigue chocando");
-                    return;
+                    if (!triedRealignment) {
+                        System.out.println("Tras realinear la pieza a izquierda/derecha sigue chocando");
+                        return;
+                    }
+                    k = 0;
+                    continue;
                 }
-                k = 0;
-                continue;
             }
+            if (termtetrisBoard[i] == 2 && randomPieceNextState[k] == 1)/*&& randomPieceNextState[k - 1] == 1)*/ {
+                System.out.println("No se puede girar, choca con otra pieza existente o con el tablero");
+                return;
+                //continue;
+            }
+
+            if (termtetrisBoard[i] != 3) {
+                newRotationPositions.add(i);
+                k++;
+            }
+
 
             //Si la pieza choca a su derecha con algo (al final), retrasamos todas sus posiciones -1 atrás en el tablero
             //-> Modificamos su posición de inico a 1 menos
@@ -337,11 +357,12 @@ public class TermTris {
 //                    if ()
 //                }
 
-
-            if ((termtetrisBoard[i] == 2 || termtetrisBoard[i] == 3) && randomPieceNextState[k] == 1) {
-                System.out.println("No se puede girar, choca con otra pieza existente o con el tablero");
-                return;
-            }
+            //if (k - 1 >= 0) {
+//                if ((termtetrisBoard[i] == 2 || termtetrisBoard[i] == 3) && randomPieceNextState[k] == 1)/*&& randomPieceNextState[k - 1] == 1)*/ {
+//                    System.out.println("No se puede girar, choca con otra pieza existente o con el tablero");
+//                    return;
+//                }
+            //}
 
 //            if (k + 1 < randomPieceNextState.length - 2 && i + 1 < termtetrisBoard.length) {
 //                //|| termtetrisBoard[i] != 2
@@ -351,11 +372,6 @@ public class TermTris {
 //                    return;
 //                }
 //            }
-
-            if (termtetrisBoard[i] != 3) {
-                newRotationPositions.add(i);
-                k++;
-            }
         }
 
         //Si la rotación es posible, elimino la pieza antigua
