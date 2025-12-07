@@ -4,7 +4,6 @@
     <root id="archive" name="TermTetris.jar">
       <element id="module-output" name="TermTetris" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/googlecode/lanterna/lanterna/3.1.3/lanterna-3.1.3.jar" path-in-jar="/" />
-      <element id="library" level="project" name="Maven: com.googlecode.lanterna:lanterna:3.1.3" />
     </root>
   </artifact>
 </component>
