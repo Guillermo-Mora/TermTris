@@ -22,15 +22,41 @@ public class TermTetris {
 
     //These work right for most fonts I think
     private final char[] blockType = new char[]{'░', '▓', '█', '▒', ' '};
+    private final String topBoardText = "▒▒▒▒▒▒▒▒▒▒▒▒";
 
-    private final String[] linesClearedMessage = new String[] {
-            "▒▒▒▒▒▒▒▒▒▒▒▒",
-            "▒LINES-0000▒",
-            "▒▒▒▒▒▒▒▒▒▒▒▒",
+    private final String[] scoreText = new String[]{
+            "▒▒▒▒▒▒▒▒▒▒▒",
+            "SCORE-0000▒",
+            "▒▒▒▒▒▒▒▒▒▒▒",
+    };
+    private final String[] linesClearedText = new String[] {
+            "▒▒▒▒▒▒▒▒▒▒▒",
+            "LINES-0000▒",
+            "▒▒▒▒▒▒▒▒▒▒▒",
+    };
+
+    private final String[] levelText = new String[]{
+            "▒▒▒▒▒▒▒▒▒▒▒",
+            "LEVEL-0001▒",
+            "▒▒▒▒▒▒▒▒▒▒▒",
+    };
+
+    private final String[] nextPieceText = new String[]{
+            "▒▒▒▒▒▒▒▒▒▒▒",
+            "          ▒",
+            "          ▒",
+            "          ▒",
+            "          ▒",
+            "▒▒▒▒▒▒▒▒▒▒▒",
     };
     private final Pieces pieces;
     private final Messages messages;
     private int linesCleared;
+    private int points;
+
+    private int level;
+
+    private List<int[]> nextrandomPiece;
     private List<int[]> currentRandomPiece;
 
     private int[] randomPieceCurrentState;
@@ -97,9 +123,11 @@ public class TermTetris {
         String[] boardLines;
         int pieceInTimer = 0;
         linesCleared = 0;
+        points = 0;
         screen.clear();
         //Show lines cleared message box
-        for (int i = 0; i < linesClearedMessage.length; i++) textGraphics.putString(0, i, linesClearedMessage[i]);
+        textGraphics.putString(0, 0, topBoardText);
+        for (int i = 0; i < linesClearedText.length; i++) textGraphics.putString(12, i, linesClearedText[i]);
 
         try {
             do {
@@ -153,7 +181,7 @@ public class TermTetris {
 
                 //Mostrar el tablero actual
                 boardLines = showBoard();
-                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i+3, boardLines[i]);
+                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i+1, boardLines[i]);
                 screen.refresh();
 
                 //El bucle del juego se ejecuta cada 16ms (62,5 veces por segundo)
@@ -275,7 +303,6 @@ public class TermTetris {
 
         int[] maxReached = new int[blocksQuantity];
         int[] blocksPositions = new int[blocksQuantity];
-        int[] newPositions = new int[blocksQuantity];
 
         for (int i = 0, currentPiece = -1; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 1) {
@@ -462,11 +489,11 @@ public class TermTetris {
                 //Mostrar las líneas cleared actuales
                 linesCleared++;
                 int drawPosition;
-                if (linesCleared <= 9) drawPosition = 10;
-                else if (linesCleared <= 99) drawPosition = 9;
-                else if (linesCleared <= 999) drawPosition = 8;
-                else drawPosition = 7;
-                textGraphics.putString(drawPosition, 1, String.valueOf(linesCleared));
+                if (linesCleared <= 9) drawPosition = 9;
+                else if (linesCleared <= 99) drawPosition = 8;
+                else if (linesCleared <= 999) drawPosition = 7;
+                else drawPosition = 6;
+                textGraphics.putString(12 + drawPosition, 1, String.valueOf(linesCleared));
 
                 //Mover todas las piezas estáticas 1 nivel más abajo de abajo hacia arriba a partir
                 // de la siguiente fila arriba de la vaciada
