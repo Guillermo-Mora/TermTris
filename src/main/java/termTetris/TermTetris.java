@@ -25,12 +25,12 @@ public class TermTetris {
 
     private final String[] linesClearedMessage = new String[] {
             "▒▒▒▒▒▒▒▒▒▒▒▒",
-            "▒LINES-000 ▒",
+            "▒LINES-0000▒",
             "▒▒▒▒▒▒▒▒▒▒▒▒",
     };
     private final Pieces pieces;
     private final Messages messages;
-    private int linesCleared = 0;
+    private int linesCleared;
     private List<int[]> currentRandomPiece;
 
     private int[] randomPieceCurrentState;
@@ -461,6 +461,15 @@ public class TermTetris {
                 for (int j = 0; j < 10; j++) {
                     termtetrisBoard[i - j] = 0;
                 }
+                //Mostrar las líneas cleared actuales
+                linesCleared++;
+                int drawPosition;
+                if (linesCleared <= 9) drawPosition = 10;
+                else if (linesCleared <= 99) drawPosition = 9;
+                else if (linesCleared <= 999) drawPosition = 8;
+                else drawPosition = 7;
+                textGraphics.putString(drawPosition, 1, String.valueOf(linesCleared));
+
                 //Mover todas las piezas estáticas 1 nivel más abajo de abajo hacia arriba a partir
                 // de la siguiente fila arriba de la vaciada
                 for (int j = i - 12; j > 0; j--) {
