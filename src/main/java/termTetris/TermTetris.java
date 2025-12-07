@@ -7,7 +7,9 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,10 @@ public class TermTetris {
 
     private int[] randomPieceCurrentState;
 
+    private final Font termTetrisFont = new Font("Hack", Font.PLAIN, 30);
+    private final AWTTerminalFontConfiguration termTetrisFontConfiguration =
+            AWTTerminalFontConfiguration.newInstance(termTetrisFont);
+
     private final DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
     private final Terminal terminal;
     private final Screen screen;
@@ -32,6 +38,8 @@ public class TermTetris {
 
     {
         try {
+            defaultTerminalFactory.setForceAWTOverSwing(true);
+            defaultTerminalFactory.setTerminalEmulatorFontConfiguration(termTetrisFontConfiguration);
             terminal = defaultTerminalFactory.createTerminal();
             screen = new TerminalScreen(terminal);
             textGraphics = screen.newTextGraphics();
@@ -383,7 +391,6 @@ public class TermTetris {
                     //Realign to right
                     if (i + 1 < termtetrisBoard.length && (directionToRealign == -1 || directionToRealign == 0)) {
                         if (termtetrisBoard[i + 1] != 3 && termtetrisBoard[i + 1] != 2) {
-                            System.out.println("Intento +1 derecha");
                             nextPieceStartPosition++;
                             i = nextPieceStartPosition - 1;
                             triedRealignment = true;
@@ -396,7 +403,6 @@ public class TermTetris {
                     //Realign to left
                     if (i - 1 >= 0 && !triedRealignment && (directionToRealign == -1 || directionToRealign == 1)) {
                         if (termtetrisBoard[i - 1] != 3 && termtetrisBoard[i - 1] != 2) {
-                            System.out.println("Intento -1 izquierda");
                             nextPieceStartPosition--;
                             i = nextPieceStartPosition - 1;
                             triedRealignment = true;
