@@ -45,7 +45,6 @@ public class TermTetris {
     public void start() {
         try {
             screen.startScreen();
-            //terminal.enterPrivateMode();
             screen.clear();
             screen.setCursorPosition(null);
         } catch (IOException e) {
