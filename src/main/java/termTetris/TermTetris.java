@@ -7,9 +7,7 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
-import com.googlecode.lanterna.terminal.swing.AWTTerminalFontConfiguration;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,16 +16,28 @@ import java.util.Objects;
 public class TermTetris {
     //Variables
     private final int[] termtetrisBoard = new int[252];
-    private final char[] blockType = new char[]{'□', '◼', '▣', '■', '▨'};
+    //Perfect characters for font type 'Hack'
+    //I don't use them becuase I have to use a separate terminal emulator window in order to change font type
+    //private final char[] blockType = new char[]{'□', '◼', '▣', '■', '▨'};
+
+    //These work right for most fonts I think
+    private final char[] blockType = new char[]{'░', '▓', '█', '▒', ' '};
+
+    private final String[] linesClearedMessage = new String[] {
+            "▒▒▒▒▒▒▒▒▒▒▒▒",
+            "▒LINES-000 ▒",
+            "▒▒▒▒▒▒▒▒▒▒▒▒",
+    };
     private final Pieces pieces;
     private final Messages messages;
+    private int linesCleared = 0;
     private List<int[]> currentRandomPiece;
 
     private int[] randomPieceCurrentState;
 
-    private final Font termTetrisFont = new Font("Hack", Font.PLAIN, 30);
-    private final AWTTerminalFontConfiguration termTetrisFontConfiguration =
-            AWTTerminalFontConfiguration.newInstance(termTetrisFont);
+    //private final Font termTetrisFont = new Font("Hack", Font.PLAIN, 30);
+    //private final AWTTerminalFontConfiguration termTetrisFontConfiguration =
+    //        AWTTerminalFontConfiguration.newInstance(termTetrisFont);
 
     private final DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
     private final Terminal terminal;
@@ -38,8 +48,9 @@ public class TermTetris {
 
     {
         try {
-            defaultTerminalFactory.setForceAWTOverSwing(true);
-            defaultTerminalFactory.setTerminalEmulatorFontConfiguration(termTetrisFontConfiguration);
+            //defaultTerminalFactory.setForceAWTOverSwing(true);
+            //defaultTerminalFactory.setPreferTerminalEmulator(true);
+            //defaultTerminalFactory.setTerminalEmulatorFontConfiguration(termTetrisFontConfiguration);
             terminal = defaultTerminalFactory.createTerminal();
             screen = new TerminalScreen(terminal);
             textGraphics = screen.newTextGraphics();
@@ -85,7 +96,10 @@ public class TermTetris {
         fillBoard();
         String[] boardLines;
         int pieceInTimer = 0;
+        linesCleared = 0;
         screen.clear();
+        //Show lines cleared message box
+        for (int i = 0; i < linesClearedMessage.length; i++) textGraphics.putString(0, i, linesClearedMessage[i]);
 
         try {
             do {
@@ -139,7 +153,7 @@ public class TermTetris {
 
                 //Mostrar el tablero actual
                 boardLines = showBoard();
-                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i, boardLines[i]);
+                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i+3, boardLines[i]);
                 screen.refresh();
 
                 //El bucle del juego se ejecuta cada 16ms (62,5 veces por segundo)
@@ -241,25 +255,14 @@ public class TermTetris {
             if (termtetrisBoard[i] == 1) {
                 oldPositions.add(i);
 
-                if (termtetrisBoard[i + 12] == 2 || termtetrisBoard[i + 12] == 3) {
-                    return false;
-                }
+                if (termtetrisBoard[i + 12] == 2 || termtetrisBoard[i + 12] == 3) return false;
 
                 newPositions.add(i + 12);
             }
         }
 
-        for (int i = 0; i < oldPositions.size(); i++) {
-            boolean dontOverride = false;
-            for (Integer newPosition : newPositions) {
-                if (Objects.equals(oldPositions.get(i), newPosition)) {
-                    dontOverride = true;
-                    break;
-                }
-            }
-            if (!dontOverride) termtetrisBoard[oldPositions.get(i)] = 0;
-            termtetrisBoard[newPositions.get(i)] = 1;
-        }
+        for (Integer oldPosition : oldPositions) termtetrisBoard[oldPosition] = 0;
+        for (Integer newPosition : newPositions) termtetrisBoard[newPosition] = 1;
         return true;
     }
 
@@ -449,7 +452,10 @@ public class TermTetris {
         int filledBlocksInLine = 0;
         for (int i = 0; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 2) filledBlocksInLine++;
-            else filledBlocksInLine = 0;
+            else {
+                filledBlocksInLine = 0;
+                continue;
+            }
             if (filledBlocksInLine == 10) {
                 //Vaciar línea detectada
                 for (int j = 0; j < 10; j++) {
@@ -457,7 +463,7 @@ public class TermTetris {
                 }
                 //Mover todas las piezas estáticas 1 nivel más abajo de abajo hacia arriba a partir
                 // de la siguiente fila arriba de la vaciada
-                for (int j = i - 2; j > 0; j--) {
+                for (int j = i - 12; j > 0; j--) {
                     if (termtetrisBoard[j] == 2) {
                         termtetrisBoard[j] = 0;
                         termtetrisBoard[j + 12] = 2;
