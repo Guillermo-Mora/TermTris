@@ -305,11 +305,9 @@ public class TermTetris {
         if (minEqualPosition < 12) return;
 
         for (int i = 0; i < blocksPositions.length; i++) {
-            if (termtetrisBoard[blocksPositions[i] + minEqualPosition] != 0) return;
-            newPositions[i] = blocksPositions[i] + minEqualPosition;
+            if (termtetrisBoard[blocksPositions[i] + minEqualPosition] == 0)
+                termtetrisBoard[blocksPositions[i] + minEqualPosition] = 4;
         }
-
-        for (int newPosition : newPositions) termtetrisBoard[newPosition] = 4;
     }
 
     public void movePieceHorizontal(boolean isRightDirection) {
