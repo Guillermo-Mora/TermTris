@@ -10,6 +10,7 @@ import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,29 +26,27 @@ public class TermTetris {
     private final String topBoardText = "▒▒▒▒▒▒▒▒▒▒▒▒";
 
     private final String[] scoreText = new String[]{
-            "▒▒▒▒▒▒▒▒▒▒▒",
-            "SCORE-0000▒",
-            "▒▒▒▒▒▒▒▒▒▒▒",
-    };
-    private final String[] linesClearedText = new String[] {
-            "▒▒▒▒▒▒▒▒▒▒▒",
-            "LINES-0000▒",
-            "▒▒▒▒▒▒▒▒▒▒▒",
-    };
-
-    private final String[] levelText = new String[]{
-            "▒▒▒▒▒▒▒▒▒▒▒",
-            "LEVEL-0001▒",
-            "▒▒▒▒▒▒▒▒▒▒▒",
+            "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
+            " SCORE      0 ▒",
+            "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
 
     private final String[] nextPieceText = new String[]{
-            "▒▒▒▒▒▒▒▒▒▒▒",
-            "          ▒",
-            "          ▒",
-            "          ▒",
-            "          ▒",
-            "▒▒▒▒▒▒▒▒▒▒▒",
+            "              ▒",
+            "              ▒",
+            "              ▒",
+            "              ▒",
+            "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
+    };
+
+    private final String[] linesClearedText = new String[]{
+            " LINES      0 ▒",
+            "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
+    };
+
+    private final String[] levelText = new String[]{
+            " LEVEL      0 ▒",
+            "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
     private final Pieces pieces;
     private final Messages messages;
@@ -55,8 +54,9 @@ public class TermTetris {
     private int points;
 
     private int level;
-
-    private List<int[]> nextrandomPiece;
+    private int linesRequiredtoNextLevel;
+    private int pieceFallSpeed;
+    private List<int[]> nextRandomPiece;
     private List<int[]> currentRandomPiece;
 
     private int[] randomPieceCurrentState;
@@ -124,11 +124,22 @@ public class TermTetris {
         int pieceInTimer = 0;
         linesCleared = 0;
         points = 0;
+        level = 0;
+        linesRequiredtoNextLevel = 5;
+        //pieceFallSpeed = 85;
+        pieceFallSpeed = 3;
+        nextRandomPiece = pieces.randomPiece();
         screen.clear();
-        //Show lines cleared message box
+        //Show board top box
         textGraphics.putString(0, 0, topBoardText);
-        for (int i = 0; i < linesClearedText.length; i++) textGraphics.putString(12, i, linesClearedText[i]);
-
+        //Show score message box
+        for (int i = 0; i < scoreText.length; i++) textGraphics.putString(12, i, scoreText[i]);
+        //Show next piece message box
+        for (int i = 0; i < nextPieceText.length; i++) textGraphics.putString(12, i + 3, nextPieceText[i]);
+        //Show lines cleared message box
+        for (int i = 0; i < linesClearedText.length; i++) textGraphics.putString(12, i + 8, linesClearedText[i]);
+        //Show level message box
+        for (int i = 0; i < levelText.length; i++) textGraphics.putString(12, i + 10, levelText[i]);
         try {
             do {
                 //Detectar entrada por teclado de manera no bloqueante
@@ -163,8 +174,8 @@ public class TermTetris {
                     if (!randomPiceInBoard()) running = false;
                 }
 
-                //Mover la pieza actual hacia abajo cada 1.5 segundos
-                if (pieceInTimer == 90) {
+                //Mover la pieza actual hacia abajo según el tiempo requerido por el nivel
+                if (pieceInTimer >= pieceFallSpeed) {
                     pieceInTimer = 0;
                     if (!movePieceDown()) {
                         transformBlockToAnotherBlock(1, 2);
@@ -181,7 +192,7 @@ public class TermTetris {
 
                 //Mostrar el tablero actual
                 boardLines = showBoard();
-                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i+1, boardLines[i]);
+                for (int i = 0; i < boardLines.length; i++) textGraphics.putString(0, i + 1, boardLines[i]);
                 screen.refresh();
 
                 //El bucle del juego se ejecuta cada 16ms (62,5 veces por segundo)
@@ -250,8 +261,10 @@ public class TermTetris {
 
     //Introduce random piece in the board
     public boolean randomPiceInBoard() {
-        currentRandomPiece = pieces.randomPiece();
+        currentRandomPiece = nextRandomPiece;
         randomPieceCurrentState = currentRandomPiece.get(1);
+        nextRandomPiece = pieces.randomPiece();
+        textGraphics.putString(12 + 5, 4, Arrays.toString(nextRandomPiece.get(1)));
 
         int i = 0, j = 0;
         int initialSpace = currentRandomPiece.getFirst().length;
@@ -288,6 +301,7 @@ public class TermTetris {
                 newPositions.add(i + 12);
             }
         }
+        if (oldPositions.isEmpty()) return false;
 
         for (Integer oldPosition : oldPositions) termtetrisBoard[oldPosition] = 0;
         for (Integer newPosition : newPositions) termtetrisBoard[newPosition] = 1;
@@ -474,6 +488,7 @@ public class TermTetris {
     }
 
     public void boardLinesFilled() {
+        int clearedLinesThisTime = 0;
         int filledBlocksInLine = 0;
         for (int i = 0; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 2) filledBlocksInLine++;
@@ -486,14 +501,7 @@ public class TermTetris {
                 for (int j = 0; j < 10; j++) {
                     termtetrisBoard[i - j] = 0;
                 }
-                //Mostrar las líneas cleared actuales
-                linesCleared++;
-                int drawPosition;
-                if (linesCleared <= 9) drawPosition = 9;
-                else if (linesCleared <= 99) drawPosition = 8;
-                else if (linesCleared <= 999) drawPosition = 7;
-                else drawPosition = 6;
-                textGraphics.putString(12 + drawPosition, 1, String.valueOf(linesCleared));
+                clearedLinesThisTime++;
 
                 //Mover todas las piezas estáticas 1 nivel más abajo de abajo hacia arriba a partir
                 // de la siguiente fila arriba de la vaciada
@@ -505,6 +513,30 @@ public class TermTetris {
                 }
             }
         }
+
+        if (clearedLinesThisTime > 0) {
+            points += (clearedLinesThisTime * 100) * level;
+            textGraphics.putString(12 + drawPositionX(points), 1, String.valueOf(points));
+
+            linesCleared += clearedLinesThisTime;
+            textGraphics.putString(12 + drawPositionX(linesCleared), 8, String.valueOf(linesCleared));
+
+            if (linesCleared >= linesRequiredtoNextLevel) {
+                linesRequiredtoNextLevel = ++level * 5 + 5;
+                textGraphics.putString(12 + drawPositionX(level), 10, String.valueOf(level));
+                if (level <= 16) pieceFallSpeed -= 5;
+                else if (level <= 18) pieceFallSpeed -= 1;
+            }
+        }
+    }
+
+    private int drawPositionX(int value) {
+        if (value <= 9) return 12;
+        else if (value <= 99) return 11;
+        else if (value <= 999) return 10;
+        else if (value <= 9999) return 9;
+        else if (value <= 99999) return 8;
+        else return 7;
     }
 
     public void transformBlockToAnotherBlock(int block, int newBlock) {
