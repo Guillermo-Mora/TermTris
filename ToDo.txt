@@ -7,21 +7,13 @@
 
 - Al terminar la partida y hacer game over, mostrará el nivel alcanzado, las lineas cleared, y la puntuación alcanzada.
 
+- En el nivel 16-18, hay un bug que hace terminar la ejecución del juego, pero no se porque ocurre, pasa muy pocas veces poer estaría bien revisarlo.
+
 - Tengo subida una imagen de referencia de como hacer la interfaz simple que muestre todo durante la partida.
 
 - Plantearme si cambiar el funcionamiento de asignación de tipo de pieza por números enteros y la escritura del tablero. Sería mejor escribir los números directamente en el tablero que sea un String mediante su referencia en el array de bloques, pero dejarlo para el final.
 
 - Una vez todo lo anterior completado y pulido, recrear el programa en kotlin, aprovechandome de las características de Kotlin.
-
-
-linesCleared++;
-                //Mostrar las líneas cleared actuales
-//                int drawPosition;
-//                if (linesCleared <= 9) drawPosition = 9;
-//                else if (linesCleared <= 99) drawPosition = 8;
-//                else drawPosition = 7;
-//                textGraphics.putString(drawPosition, 1, String.valueOf(linesCleared));
-
 
 1 2   3 4 5 6 7 8 9 10    11  12
 1 2   3 4 5 6 7 8 9 10    11  12
