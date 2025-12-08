@@ -108,7 +108,6 @@ public class TermTetris {
                 }
             } while (true);
             screen.stopScreen();
-            terminal.exitPrivateMode();
             screen.close();
             terminal.close();
         } catch (IOException e) {
@@ -214,8 +213,12 @@ public class TermTetris {
                 if (keyStroke != null) {
                     if (keyStroke.getKeyType() == KeyType.Enter) gameStart();
                     else if (keyStroke.getCharacter() != null &&
-                            (keyStroke.getCharacter() == 'q' || keyStroke.getCharacter() == 'Q'))
+                            (keyStroke.getCharacter() == 'q' || keyStroke.getCharacter() == 'Q')) {
+                        screen.stopScreen();
+                        screen.close();
+                        terminal.close();
                         System.exit(0);
+                    }
                 }
             } while (true);
         } catch (IOException e) {
