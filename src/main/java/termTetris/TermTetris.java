@@ -263,7 +263,33 @@ public class TermTetris {
         currentRandomPiece = nextRandomPiece;
         randomPieceCurrentState = currentRandomPiece.get(1);
         nextRandomPiece = pieces.randomPiece();
-        textGraphics.putString(12 + 5, 4, Arrays.toString(nextRandomPiece.get(1)));
+        StringBuilder[] nextPieceBlocks = new StringBuilder[2];
+        nextPieceBlocks[0] = new StringBuilder();
+        nextPieceBlocks[1] = new StringBuilder();
+
+        int spacesLength = nextRandomPiece.getFirst().length;
+        int spacesCount = spacesLength;
+        int secondLineSpaces = 0;
+
+        for (int i = 0; i < nextRandomPiece.get(1).length-2; i++) {
+            if (spacesCount < 10) {
+                if (nextRandomPiece.get(1)[i] == 1) nextPieceBlocks[0].append(blockType[nextRandomPiece.get(1)[i]]);
+            } else {
+                if (nextRandomPiece.get(1)[i] == 0 && spacesLength > 0) spacesLength--;
+                else if (nextRandomPiece.get(1)[i] == 0) secondLineSpaces++;
+                else if (nextRandomPiece.get(1)[i] == 1)
+                    nextPieceBlocks[1].append(blockType[nextRandomPiece.get(1)[i]]);
+            }
+            spacesCount++;
+        }
+        secondLineSpaces -= spacesLength;
+
+        //Clear previous next piece
+        for (int i = 0; i < 2; i++) textGraphics.putString(12+1, 4+i, "             ");
+
+        //Show next piece
+        for (int i = 0; i < nextPieceBlocks.length; i++)
+            textGraphics.putString(12+6 + (i == 1 ? secondLineSpaces : 0), 4+i, nextPieceBlocks[i].toString());
 
         int i = 0, j = 0;
         int initialSpace = currentRandomPiece.getFirst().length;
@@ -514,7 +540,7 @@ public class TermTetris {
         }
 
         if (clearedLinesThisTime > 0) {
-            points += (clearedLinesThisTime * 100) * level;
+            points += (clearedLinesThisTime * 100) * (level + 1);
             textGraphics.putString(12 + drawPositionX(points), 1, String.valueOf(points));
 
             linesCleared += clearedLinesThisTime;
