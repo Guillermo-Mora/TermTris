@@ -37,7 +37,6 @@ public class TermTetris {
             "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
     private final Pieces pieces;
-    private boolean newPiece;
     private final Messages messages;
     private int linesCleared;
     private int points;
@@ -94,7 +93,7 @@ public class TermTetris {
 
     public void gameStart() {
         boolean running = true;
-        newPiece = true;
+        boolean newPiece = true;
         fillBoard();
         String[] boardLines;
         int pieceInTimer = 0;
