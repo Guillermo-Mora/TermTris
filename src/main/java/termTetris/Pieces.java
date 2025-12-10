@@ -192,7 +192,6 @@ public class Pieces{
                     )
             )
     );
-
     private static Pieces pieces_instance = null;
 
     public List<int[]> randomPiece() {

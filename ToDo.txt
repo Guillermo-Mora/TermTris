@@ -16,6 +16,7 @@
 - Tengo subida una imagen de referencia de como hacer la interfaz simple que muestre todo durante la partida.
 
 - Plantearme si cambiar el funcionamiento de asignación de tipo de pieza por números enteros y la escritura del tablero. Sería mejor escribir los números directamente en el tablero que sea un String mediante su referencia en el array de bloques, pero dejarlo para el final.
+[Añadiría complejidad a la hora de comprobar valores, no vale la pena]
 
 - Una vez todo lo anterior completado y pulido, recrear el programa en kotlin, aprovechandome de las características de Kotlin.
 

@@ -351,9 +351,9 @@ public class TermTetris {
 
         if (minEqualPosition < 12) return;
 
-        for (int i = 0; i < blocksPositions.length; i++) {
-            if (termtetrisBoard[blocksPositions[i] + minEqualPosition] == 0)
-                termtetrisBoard[blocksPositions[i] + minEqualPosition] = 4;
+        for (int blocksPosition : blocksPositions) {
+            if (termtetrisBoard[blocksPosition + minEqualPosition] == 0)
+                termtetrisBoard[blocksPosition + minEqualPosition] = 4;
         }
     }
 
@@ -470,12 +470,10 @@ public class TermTetris {
                 }
             }
             if (termtetrisBoard[i] == 2 && randomPieceNextState[k] == 1) return;
+            if (termtetrisBoard[i] == 3) continue;
 
-
-            if (termtetrisBoard[i] != 3) {
-                newRotationPositions.add(i);
-                k++;
-            }
+            newRotationPositions.add(i);
+            k++;
         }
 
         //Si la rotación es posible, elimino la pieza antigua
