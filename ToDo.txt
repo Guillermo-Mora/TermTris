@@ -11,6 +11,7 @@
 [Implementado]
 
 - En el nivel 16-18, hay un bug que hace terminar la ejecución del juego, pero no se porque ocurre, pasa muy pocas veces pero estaría bien revisarlo.
+[Solucionado]
 
 - Tengo subida una imagen de referencia de como hacer la interfaz simple que muestre todo durante la partida.
 
@@ -40,3 +41,6 @@ Level piece Speed
 13- 20
 14- 15
 15- 10
+16- 5
+17- 4
+18- 3

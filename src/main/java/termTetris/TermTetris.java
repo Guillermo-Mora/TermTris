@@ -102,7 +102,8 @@ public class TermTetris {
         points = 0;
         level = 0;
         linesRequiredtoNextLevel = 5;
-        pieceFallSpeed = 85;
+        //pieceFallSpeed = 85;
+        pieceFallSpeed = 5;
         nextRandomPiece = pieces.randomPiece();
         screen.clear();
         //Show board top box
@@ -326,6 +327,7 @@ public class TermTetris {
         for (int i = 0, currentPiece = -1; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == 1) {
                 currentPiece++;
+                if (currentPiece > blocksPositions.length-1) return;
                 blocksPositions[currentPiece] = i;
                 do {
                     if (i + maxReached[currentPiece] + 12 < termtetrisBoard.length) {
