@@ -10,27 +10,17 @@ import com.googlecode.lanterna.terminal.Terminal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class TermTetris {
-    //Variables
     private final int[] termtetrisBoard = new int[252];
-    //Perfect characters for font type 'Hack'
-    //I don't use them becuase I have to use a separate terminal emulator window in order to change font type
-    //private final char[] blockType = new char[]{'□', '◼', '▣', '■', '▨'};
-
-    //These work right for most fonts I think
     private final char[] blockType = new char[]{'░', '▓', '█', '▒', ' '};
-    private final String topBoardText = "▒▒▒▒▒▒▒▒▒▒▒▒";
-
     private final String[] scoreText = new String[]{
             "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
             " SCORE      0 ▒",
             "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
-
     private final String[] nextPieceText = new String[]{
             "              ▒",
             "              ▒",
@@ -38,45 +28,32 @@ public class TermTetris {
             "              ▒",
             "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
-
     private final String[] linesClearedText = new String[]{
             " LINES      0 ▒",
             "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
-
     private final String[] levelText = new String[]{
             " LEVEL      0 ▒",
             "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
     };
     private final Pieces pieces;
+    private boolean newPiece;
     private final Messages messages;
     private int linesCleared;
     private int points;
-
     private int level;
     private int linesRequiredtoNextLevel;
     private int pieceFallSpeed;
     private List<int[]> nextRandomPiece;
     private List<int[]> currentRandomPiece;
-
     private int[] randomPieceCurrentState;
-
-    //private final Font termTetrisFont = new Font("Hack", Font.PLAIN, 30);
-    //private final AWTTerminalFontConfiguration termTetrisFontConfiguration =
-    //        AWTTerminalFontConfiguration.newInstance(termTetrisFont);
-
     private final DefaultTerminalFactory defaultTerminalFactory = new DefaultTerminalFactory();
     private final Terminal terminal;
     private final Screen screen;
-
     private final TextGraphics textGraphics;
     private KeyStroke keyStroke;
-
     {
         try {
-            //defaultTerminalFactory.setForceAWTOverSwing(true);
-            //defaultTerminalFactory.setPreferTerminalEmulator(true);
-            //defaultTerminalFactory.setTerminalEmulatorFontConfiguration(termTetrisFontConfiguration);
             terminal = defaultTerminalFactory.createTerminal();
             screen = new TerminalScreen(terminal);
             textGraphics = screen.newTextGraphics();
@@ -117,7 +94,7 @@ public class TermTetris {
 
     public void gameStart() {
         boolean running = true;
-        boolean newPiece = true;
+        newPiece = true;
         fillBoard();
         String[] boardLines;
         int pieceInTimer = 0;
@@ -129,7 +106,7 @@ public class TermTetris {
         nextRandomPiece = pieces.randomPiece();
         screen.clear();
         //Show board top box
-        textGraphics.putString(0, 0, topBoardText);
+        textGraphics.putString(0, 0, "▒▒▒▒▒▒▒▒▒▒▒▒");
         //Show score message box
         for (int i = 0; i < scoreText.length; i++) textGraphics.putString(12, i, scoreText[i]);
         //Show next piece message box
@@ -226,7 +203,7 @@ public class TermTetris {
         }
     }
 
-    public void fillBoard() {
+    private void fillBoard() {
         for (int i = 0; i < termtetrisBoard.length; ) {
             if (i >= termtetrisBoard.length - 12) {
                 termtetrisBoard[i] = 3;
@@ -243,7 +220,7 @@ public class TermTetris {
         }
     }
 
-    public String[] showBoard() {
+    private String[] showBoard() {
         String[] lines = new String[21];
         int currentLine = 0;
         StringBuilder currentString = new StringBuilder();
@@ -262,7 +239,7 @@ public class TermTetris {
     }
 
     //Introduce random piece in the board
-    public boolean randomPiceInBoard() {
+    private boolean randomPiceInBoard() {
         currentRandomPiece = nextRandomPiece;
         randomPieceCurrentState = currentRandomPiece.get(1);
         nextRandomPiece = pieces.randomPiece();
@@ -316,7 +293,7 @@ public class TermTetris {
         return true;
     }
 
-    public boolean movePieceDown() {
+    private boolean movePieceDown() {
         ArrayList<Integer> oldPositions = new ArrayList<>();
         ArrayList<Integer> newPositions = new ArrayList<>();
 
@@ -336,7 +313,7 @@ public class TermTetris {
         return true;
     }
 
-    public void showPieceBottomPosition() {
+    private void showPieceBottomPosition() {
         int blocksQuantity = 0;
         int minEqualPosition = 0;
 
@@ -379,7 +356,7 @@ public class TermTetris {
         }
     }
 
-    public void movePieceHorizontal(boolean isRightDirection) {
+    private void movePieceHorizontal(boolean isRightDirection) {
         int direction;
 
         if (isRightDirection) direction = 1;
@@ -413,7 +390,7 @@ public class TermTetris {
         }
     }
 
-    public void rotatePieceClockwise() {
+    private void rotatePieceClockwise() {
         int nextRotationPositionY = randomPieceCurrentState[randomPieceCurrentState.length - 2];
         int nextRotationPositionX = randomPieceCurrentState[randomPieceCurrentState.length - 1];
         ArrayList<Integer> oldRotationPositions = new ArrayList<>();
@@ -447,12 +424,18 @@ public class TermTetris {
         //Añado la pieza actual con la nueva rotación a partir de la posición del primer bloque
         // de la pieza anterior junto con sus coordenadas añadidas
         for (int i = nextPieceStartPosition, k = 0; k < randomPieceNextState.length - 2; i++) {
-            if (i >= termtetrisBoard.length || i < 0) {
+            if (i >= termtetrisBoard.length) {
                 //System.out.println("No se puede girar, fuera del rango del tablero");
                 return;
             }
 
-            //System.out.println(termtetrisBoard[i] + " | " + randomPieceNextState[k]);
+            if (i < 0) {
+                k = 0;
+                nextPieceStartPosition += 12;
+                i = nextPieceStartPosition - 1;
+                continue;
+            }
+
             if (k - 1 >= 0) {
                 if ((termtetrisBoard[i] == 2 || termtetrisBoard[i] == 3) && randomPieceNextState[k] == 1
                         && randomPieceNextState[k - 1] == 1) {
@@ -482,18 +465,13 @@ public class TermTetris {
                         }
                     }
 
-                    if (!triedRealignment || realignmentTries == 3) {
-                        //System.out.println("Tras realinear la pieza a izquierda/derecha sigue chocando");
-                        return;
-                    }
+                    if (!triedRealignment || realignmentTries == 3) return;
                     k = 0;
                     continue;
                 }
             }
-            if (termtetrisBoard[i] == 2 && randomPieceNextState[k] == 1) {
-                //System.out.println("No se puede girar, choca con otra pieza existente o con el tablero");
-                return;
-            }
+            if (termtetrisBoard[i] == 2 && randomPieceNextState[k] == 1) return;
+
 
             if (termtetrisBoard[i] != 3) {
                 newRotationPositions.add(i);
@@ -515,7 +493,7 @@ public class TermTetris {
         randomPieceCurrentState = randomPieceNextState;
     }
 
-    public void boardLinesFilled() {
+    private void boardLinesFilled() {
         int clearedLinesThisTime = 0;
         int filledBlocksInLine = 0;
         for (int i = 0; i < termtetrisBoard.length; i++) {
@@ -567,7 +545,7 @@ public class TermTetris {
         else return 7;
     }
 
-    public void transformBlockToAnotherBlock(int block, int newBlock) {
+    private void transformBlockToAnotherBlock(int block, int newBlock) {
         for (int i = 0; i < termtetrisBoard.length; i++) {
             if (termtetrisBoard[i] == block) termtetrisBoard[i] = newBlock;
         }

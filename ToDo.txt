@@ -1,13 +1,15 @@
 - Añadir empuje superior hacia abajo si al mover la pieza choca con el techo y tiene espacio para bajar -> Implementarlo llamando al metodo de bajar pieza directamente. Ya que ese metodo comprueba si puede bajar o no. (Esto podría usarlo tambien para las patadas laterales, llamando a los metodos de mover lateralmente, y seria mucho mas consistente el funcionamiento).
+[Implementado de una manera mucho más simple]
 
 - Añadir marcador con Nivel actual, siguiente pieza, lineas limpiadas y puntuación actual.
 - Implementar funcionamiento de subida de nivel a medida que se avanza, cosa que aumenta la dificultad. Al subir de nivel, el número que marca la cantidad de ticks necesarios para bajar una pieza, disminuye poco a poco, aumentando así la velocidad del juego.
+[Implementado]
 
 - Tengo guardada una imagen de referencia de cómo hacer la interfaz.
 
 - Al terminar la partida y hacer game over, mostrará el nivel alcanzado, las lineas cleared, y la puntuación alcanzada.
 
-- En el nivel 16-18, hay un bug que hace terminar la ejecución del juego, pero no se porque ocurre, pasa muy pocas veces poer estaría bien revisarlo.
+- En el nivel 16-18, hay un bug que hace terminar la ejecución del juego, pero no se porque ocurre, pasa muy pocas veces pero estaría bien revisarlo.
 
 - Tengo subida una imagen de referencia de como hacer la interfaz simple que muestre todo durante la partida.
 
