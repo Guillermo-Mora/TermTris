@@ -102,8 +102,7 @@ public class TermTetris {
         points = 0;
         level = 0;
         linesRequiredtoNextLevel = 5;
-        //pieceFallSpeed = 85;
-        pieceFallSpeed = 5;
+        pieceFallSpeed = 85;
         nextRandomPiece = pieces.randomPiece();
         screen.clear();
         //Show board top box
