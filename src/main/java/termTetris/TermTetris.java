@@ -145,7 +145,7 @@ public class TermTetris {
                 //Añadir nueva pieza al tablero si la última ha llegado al fondo
                 if (newPiece) {
                     newPiece = false;
-                    if (!randomPiceInBoard()) running = false;
+                    if (!randomPieceInBoard()) running = false;
                 }
 
                 //Mover la pieza actual hacia abajo según el tiempo requerido por el nivel
@@ -238,7 +238,7 @@ public class TermTetris {
     }
 
     //Introduce random piece in the board
-    private boolean randomPiceInBoard() {
+    private boolean randomPieceInBoard() {
         currentRandomPiece = nextRandomPiece;
         randomPieceCurrentState = currentRandomPiece.get(1);
         nextRandomPiece = pieces.randomPiece();
@@ -271,18 +271,19 @@ public class TermTetris {
             textGraphics.putString(12+6 + (i == 1 ? secondLineSpaces : 0), 4+i, nextPieceBlocks[i].toString());
 
         int i = 0, j = 0;
-        int initialSpace = currentRandomPiece.getFirst().length;
+
+        for (; i < currentRandomPiece.getFirst().length; i++) {
+            if (termtetrisBoard[1 + i] != 2) termtetrisBoard[1 + i] = 0;
+            else System.out.println("No sobreescribo con vacio");
+        }
+        i++;
 
         while (j < randomPieceCurrentState.length - 2) {
             if (termtetrisBoard[i] != 3) {
-                while (initialSpace > 0) {
-                    termtetrisBoard[i] = 0;
-                    initialSpace--;
-                    i++;
-                }
                 if (termtetrisBoard[i] == 2 && randomPieceCurrentState[j] == 1) {
                     return false;
-                } else termtetrisBoard[i] = randomPieceCurrentState[j];
+                } else if (termtetrisBoard[i] == 0)
+                    termtetrisBoard[i] = randomPieceCurrentState[j];
                 i++;
                 j++;
             } else {
