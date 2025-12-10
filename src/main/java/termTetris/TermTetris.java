@@ -182,7 +182,7 @@ public class TermTetris {
             } while (running);
 
             screen.clear();
-            String[] gameOverMessage = messages.gameOverMessage();
+            String[] gameOverMessage = messages.gameOverMessage(points, linesCleared, level);
             for (int i = 0; i < gameOverMessage.length; i++) textGraphics.putString(0, i, gameOverMessage[i]);
             screen.refresh();
             do {
@@ -424,11 +424,9 @@ public class TermTetris {
         //Añado la pieza actual con la nueva rotación a partir de la posición del primer bloque
         // de la pieza anterior junto con sus coordenadas añadidas
         for (int i = nextPieceStartPosition, k = 0; k < randomPieceNextState.length - 2; i++) {
-            if (i >= termtetrisBoard.length) {
-                //System.out.println("No se puede girar, fuera del rango del tablero");
-                return;
-            }
+            if (i >= termtetrisBoard.length) return;
 
+            //Piece cant rotate becuase is at the top of the board
             if (i < 0) {
                 k = 0;
                 nextPieceStartPosition += 12;

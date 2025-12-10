@@ -8,6 +8,7 @@
 - Tengo guardada una imagen de referencia de cómo hacer la interfaz.
 
 - Al terminar la partida y hacer game over, mostrará el nivel alcanzado, las lineas cleared, y la puntuación alcanzada.
+[Implementado]
 
 - En el nivel 16-18, hay un bug que hace terminar la ejecución del juego, pero no se porque ocurre, pasa muy pocas veces pero estaría bien revisarlo.
 

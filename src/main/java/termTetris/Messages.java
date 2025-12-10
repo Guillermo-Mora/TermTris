@@ -2,7 +2,7 @@ package termTetris;
 
 public class Messages {
 
-    public String[] gameOverMessage() {
+    public String[] gameOverMessage(int points, int linesCleared, int level) {
         return new String[]{
                 " ██████╗  █████╗ ███╗   ███╗███████╗     ██████╗ ██╗   ██╗███████╗██████╗ ",
                 "██╔════╝ ██╔══██╗████╗ ████║██╔════╝    ██╔═══██╗██║   ██║██╔════╝██╔══██╗",
@@ -11,8 +11,12 @@ public class Messages {
                 "╚██████╔╝██║  ██║██║ ╚═╝ ██║███████╗    ╚██████╔╝ ╚████╔╝ ███████╗██║  ██║",
                 " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝     ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝",
                 "",
-                "║ Type 'Q' to exit",
-                "║ Press 'Enter' to start a new Game"
+                "╔═ Score: " + points,
+                "╠═ Lines: " + linesCleared,
+                "╚═ Level: " + level,
+                "",
+                "╔═ Press 'Q' to exit",
+                "╚═ Press 'Enter' to start a new Game"
         };
     }
 
@@ -25,8 +29,8 @@ public class Messages {
                 "   ██║   ███████╗██║  ██║██║ ╚═╝ ██║   ██║   ███████╗   ██║   ██║  ██║██║███████║",
                 "   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝╚══════╝",
                 "",
-                "║ Type 'Q' to exit",
-                "║ Press 'Enter' to start a new Game"
+                "╔═ Press 'Q' to exit",
+                "╚═ Press 'Enter' to start a new Game"
         };
     }
 }
