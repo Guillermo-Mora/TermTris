@@ -125,7 +125,7 @@ public class TermTetris {
                     else if (keyStroke.getKeyType() == KeyType.ArrowUp) rotatePieceClockwise();
                     else if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == ' ') {
                         do {
-                            if (!movePieceDown()) {
+                            if (cantMovePieceDown()) {
                                 transformBlockToAnotherBlock(1, 2);
                                 //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
                                 boardLinesFilled();
@@ -134,7 +134,7 @@ public class TermTetris {
                             }
                         } while (true);
                     } else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
-                        if (!movePieceDown()) {
+                        if (cantMovePieceDown()) {
                             transformBlockToAnotherBlock(1, 2);
                             //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
                             boardLinesFilled();
@@ -152,7 +152,7 @@ public class TermTetris {
                 //Mover la pieza actual hacia abajo según el tiempo requerido por el nivel
                 if (pieceInTimer >= pieceFallSpeed) {
                     pieceInTimer = 0;
-                    if (!movePieceDown()) {
+                    if (cantMovePieceDown()) {
                         transformBlockToAnotherBlock(1, 2);
                         //Comprobar si hay líneas completas, y si hay, mover las piezas 1 nivel más abajo
                         boardLinesFilled();
@@ -293,7 +293,7 @@ public class TermTetris {
         return true;
     }
 
-    private boolean movePieceDown() {
+    private boolean cantMovePieceDown() {
         ArrayList<Integer> oldPositions = new ArrayList<>();
         ArrayList<Integer> newPositions = new ArrayList<>();
 
@@ -301,16 +301,16 @@ public class TermTetris {
             if (termtetrisBoard[i] == 1) {
                 oldPositions.add(i);
 
-                if (termtetrisBoard[i + 12] == 2 || termtetrisBoard[i + 12] == 3) return false;
+                if (termtetrisBoard[i + 12] == 2 || termtetrisBoard[i + 12] == 3) return true;
 
                 newPositions.add(i + 12);
             }
         }
-        if (oldPositions.isEmpty()) return false;
+        if (oldPositions.isEmpty()) return true;
 
         for (Integer oldPosition : oldPositions) termtetrisBoard[oldPosition] = 0;
         for (Integer newPosition : newPositions) termtetrisBoard[newPosition] = 1;
-        return true;
+        return false;
     }
 
     private void showPieceBottomPosition() {
