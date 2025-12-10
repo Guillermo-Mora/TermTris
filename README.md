@@ -2,7 +2,7 @@
 <br />
 <ul>
   <li>
-    This project was made using the Java Lanterna libray, for creating and displaying terminal GUIs. <a href="https://github.com/mabe02/lanterna">Lanterna</a>
+    This project was made using the Java Lanterna libray, for creating and displaying terminal GUIs. <a href="https://github.com/mabe02/lanterna" target="_blank">Lanterna</a>
   </li>
 </ul>
 <br />
